@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import * as S from "./styles";
+import { api } from "../../lib/axios";
 
 const registerFormSchema = z.object({
   username: z
@@ -42,7 +43,18 @@ export default function Register() {
     }
   }, [router.query?.username, setValue]);
 
-  async function handleRegister(data: RegisterFormData) {}
+  async function handleRegister(data: RegisterFormData) {
+    const { name, username } = data;
+
+    try {
+      await api.post("/users", {
+        username,
+        name,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <S.Container>
