@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import * as S from "./styles";
 import { api } from "../../lib/axios";
+import { AxiosError } from "axios";
 
 const registerFormSchema = z.object({
   username: z
@@ -52,7 +53,12 @@ export default function Register() {
         name,
       });
     } catch (error) {
-      console.log(error);
+      if (error instanceof AxiosError && error?.response?.data?.message) {
+        alert(error.response.data.message);
+        return;
+      }
+
+      console.error(error);
     }
   }
 
