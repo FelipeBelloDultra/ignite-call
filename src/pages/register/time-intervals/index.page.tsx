@@ -16,6 +16,7 @@ import { convertTimeStringToMinutes } from "../../../utils/convert-time-string-t
 
 import * as registerStyles from "../styles";
 import * as timeIntervalsStyles from "./styles";
+import { api } from "../../../lib/axios";
 
 const S = {
   ...registerStyles,
@@ -90,9 +91,11 @@ export default function TimeIntervals() {
   const intervals = watch("intervals");
 
   async function handleSetTimeIntervals(data: unknown) {
-    const formData = data as TimeIntervalsFormOutput;
+    const { intervals } = data as TimeIntervalsFormOutput;
 
-    console.log(formData);
+    await api.post("/users/time-intervals", {
+      intervals,
+    });
   }
 
   return (

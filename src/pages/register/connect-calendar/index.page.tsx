@@ -22,6 +22,10 @@ export default function ConnectCalendar() {
     await signIn();
   }
 
+  async function handleNavigateToNextStep() {
+    await router.push("/register/time-intervals");
+  }
+
   return (
     <S.Container>
       <S.Header>
@@ -62,7 +66,7 @@ export default function ConnectCalendar() {
           </S.AuthError>
         )}
 
-        <Button disabled={!isSignedIn}>
+        <Button disabled={!isSignedIn} onClick={handleNavigateToNextStep}>
           Próximo passo
           <ArrowRight />
         </Button>
