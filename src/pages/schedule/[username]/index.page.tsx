@@ -3,6 +3,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 
 import { prisma } from "../../../lib/prisma";
 
+import { ScheduleForm } from "./schedule-form";
 import * as S from "./styles";
 
 interface ScheduleProps {
@@ -21,6 +22,8 @@ export default function Schedule({ user }: ScheduleProps) {
         <Heading>{user.name}</Heading>
         <Text>{user.bio}</Text>
       </S.UserHeader>
+
+      <ScheduleForm />
     </S.Container>
   );
 }
