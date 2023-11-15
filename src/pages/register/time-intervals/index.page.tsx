@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { getWeekDays } from "../../../utils/get-week-days";
+import { convertTimeStringToMinutes } from "../../../utils/convert-time-string-to-minutes";
 
 import * as registerStyles from "../styles";
 import * as timeIntervalsStyles from "./styles";
@@ -35,10 +36,29 @@ const timeIntervalsFormSchema = z.object({
     .transform((intervals) => intervals.filter((interval) => interval.enabled))
     .refine((intervals) => intervals.length > 0, {
       message: "Selecione pelo menos um dia da semana",
-    }),
+    })
+    .transform((intervals) =>
+      intervals.map((interval) => ({
+        weekDay: interval.weekDay,
+        startTimeInMinutes: convertTimeStringToMinutes(interval.startTime),
+        endTimeInMinutes: convertTimeStringToMinutes(interval.endTime),
+      }))
+    )
+    .refine(
+      (intervals) =>
+        intervals.every(
+          (interval) =>
+            interval.endTimeInMinutes - 60 >= interval.startTimeInMinutes
+        ),
+      {
+        message:
+          "O horario de termino deve ser pelo menos 1h distante do inicio",
+      }
+    ),
 });
 
-type TimeIntervalsFormSchema = z.infer<typeof timeIntervalsFormSchema>;
+type TimeIntervalsFormInput = z.input<typeof timeIntervalsFormSchema>;
+type TimeIntervalsFormOutput = z.output<typeof timeIntervalsFormSchema>;
 
 export default function TimeIntervals() {
   const {
@@ -47,7 +67,7 @@ export default function TimeIntervals() {
     control,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm({
+  } = useForm<TimeIntervalsFormInput>({
     resolver: zodResolver(timeIntervalsFormSchema),
     defaultValues: {
       intervals: [
@@ -69,11 +89,11 @@ export default function TimeIntervals() {
 
   const intervals = watch("intervals");
 
-  async function handleSetTimeIntervals(data: TimeIntervalsFormSchema) {
-    console.log(data);
-  }
+  async function handleSetTimeIntervals(data: unknown) {
+    const formData = data as TimeIntervalsFormOutput;
 
-  console.log(errors);
+    console.log(formData);
+  }
 
   return (
     <S.Container>
