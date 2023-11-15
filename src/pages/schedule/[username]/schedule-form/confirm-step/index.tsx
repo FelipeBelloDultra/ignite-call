@@ -1,13 +1,34 @@
 import { Button, Text, TextArea, TextInput } from "@ignite-ui/react";
 import { CalendarBlank, Clock } from "phosphor-react";
+import { z } from "zod";
 
 import * as S from "./styles";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const confirmFormSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "O nome precisa no minimo de 3 caracteres" }),
+  email: z.string().email({ message: "Digite um email valido" }),
+  observations: z.string().nullable(),
+});
+
+type ConfirmFormData = z.infer<typeof confirmFormSchema>;
 
 export function ConfirmStep() {
-  function handleConfirmScheduling() {}
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ConfirmFormData>({
+    resolver: zodResolver(confirmFormSchema),
+  });
+
+  async function handleConfirmScheduling(data: ConfirmFormData) {}
 
   return (
-    <S.ConfirmForm as="form" onSubmit={handleConfirmScheduling}>
+    <S.ConfirmForm as="form" onSubmit={handleSubmit(handleConfirmScheduling)}>
       <S.FormHeader>
         <Text>
           <CalendarBlank />
@@ -21,7 +42,14 @@ export function ConfirmStep() {
 
       <label>
         <Text size="sm">Nome completo</Text>
-        <TextInput placeholder="Seu nome" crossOrigin="" />
+        <TextInput
+          placeholder="Seu nome"
+          crossOrigin=""
+          {...register("name")}
+        />
+        {errors.name && (
+          <S.FormError size="sm">{errors.name.message}</S.FormError>
+        )}
       </label>
 
       <label>
@@ -30,19 +58,25 @@ export function ConfirmStep() {
           type="email"
           placeholder="johndoe@example.com"
           crossOrigin=""
+          {...register("email")}
         />
+        {errors.email && (
+          <S.FormError size="sm">{errors.email.message}</S.FormError>
+        )}
       </label>
 
       <label>
         <Text size="sm">Observações</Text>
-        <TextArea />
+        <TextArea {...register("observations")} />
       </label>
 
       <S.FormActions>
         <Button type="button" variant="tertiary">
           Cancelar
         </Button>
-        <Button type="submit">Confirmar</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          Confirmar
+        </Button>
       </S.FormActions>
     </S.ConfirmForm>
   );
