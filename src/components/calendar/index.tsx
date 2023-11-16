@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CaretLeft, CaretRight } from "phosphor-react";
 import dayjs from "dayjs";
 
 import * as S from "./styles";
+
+interface CalendarWeek {
+  week: number;
+  days: Array<{
+    date: dayjs.Dayjs;
+    disabled: boolean;
+  }>;
+}
+
+type CalendarWeeks = CalendarWeek[];
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(() => {
@@ -23,6 +33,61 @@ export function Calendar() {
 
   const currentMonth = currentDate.format("MMMM");
   const currentYear = currentDate.format("YYYY");
+
+  const calendarWeeks = useMemo(() => {
+    const daysInMonthArray = Array.from(
+      {
+        length: currentDate.daysInMonth(),
+      },
+      (_, i) => ({
+        date: currentDate.set("date", i + 1),
+        disabled: false,
+      })
+    );
+
+    const firstWeekDay = currentDate.get("day");
+
+    const previousMonthFillArray = Array.from(
+      { length: firstWeekDay },
+      (_, i) => ({
+        date: currentDate.subtract(firstWeekDay - i, "day"),
+        disabled: true,
+      })
+    );
+
+    const lastDayInCurrentMonth = currentDate.set(
+      "date",
+      currentDate.daysInMonth()
+    );
+    const lastWeekDay = lastDayInCurrentMonth.get("day");
+
+    const nextMonthFillArray = Array.from(
+      {
+        length: 7 - (lastWeekDay + 1),
+      },
+      (_, i) => ({
+        date: lastDayInCurrentMonth.add(i + 1, "day"),
+        disabled: true,
+      })
+    );
+
+    const calendarDays = [
+      ...previousMonthFillArray,
+      ...daysInMonthArray,
+      ...nextMonthFillArray,
+    ];
+
+    const calendarWeeks: CalendarWeeks = [];
+
+    for (let i = 0; i < calendarDays.length; i += 7) {
+      calendarWeeks.push({
+        week: i / 7,
+        days: calendarDays.slice(i, i + 7),
+      });
+    }
+
+    return calendarWeeks;
+  }, [currentDate]);
 
   return (
     <S.CalendarContainer>
@@ -54,21 +119,17 @@ export function Calendar() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <S.CalendarDay>1</S.CalendarDay>
-            </td>
-            <td>
-              <S.CalendarDay>2</S.CalendarDay>
-            </td>
-            <td>
-              <S.CalendarDay>3</S.CalendarDay>
-            </td>
-          </tr>
+          {calendarWeeks.map(({ week, days }) => (
+            <tr key={week}>
+              {days.map(({ date, disabled }) => (
+                <td key={date.toString()}>
+                  <S.CalendarDay disabled={disabled}>
+                    {date.get("date")}
+                  </S.CalendarDay>
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </S.CalendarBody>
     </S.CalendarContainer>
