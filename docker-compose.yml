@@ -8,3 +8,23 @@ services:
     ports:
       - 3000:3000
       - 5555:5555
+    networks:
+      - ignite-call-net
+
+  database:
+    image: mysql:8.2
+    environment:
+      - MYSQL_ROOT_PASSWORD=docker
+    networks:
+      - ignite-call-net
+    ports:
+      - 3306:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:
+
+networks:
+  ignite-call-net:
+    driver: bridge
