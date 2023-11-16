@@ -5,6 +5,7 @@ import { ArrowRight } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { NextSeo } from "next-seo";
 
 import * as S from "./styles";
 import { api } from "../../lib/axios";
@@ -65,50 +66,54 @@ export default function Register() {
   }
 
   return (
-    <S.Container>
-      <S.Header>
-        <Heading as="strong">Bem-vindo ao Ignite Call!</Heading>
-        <Text>
-          Precisamos de algumas informações para criar seu perfil! Ah, você pode
-          editar essas informações depois.
-        </Text>
+    <>
+      <NextSeo title="Crie uma conta | IgniteCall" />
 
-        <MultiStep size={4} currentStep={1} />
-      </S.Header>
+      <S.Container>
+        <S.Header>
+          <Heading as="strong">Bem-vindo ao Ignite Call!</Heading>
+          <Text>
+            Precisamos de algumas informações para criar seu perfil! Ah, você
+            pode editar essas informações depois.
+          </Text>
 
-      <S.Form as="form" onSubmit={handleSubmit(handleRegister)}>
-        <label>
-          <Text size="sm">Nome de usuário</Text>
-          <TextInput
-            crossOrigin=""
-            prefix="ignite.com/"
-            placeholder="se-usuario"
-            {...register("username")}
-          />
+          <MultiStep size={4} currentStep={1} />
+        </S.Header>
 
-          {errors.username && (
-            <S.FormError size="sm">{errors.username.message}</S.FormError>
-          )}
-        </label>
+        <S.Form as="form" onSubmit={handleSubmit(handleRegister)}>
+          <label>
+            <Text size="sm">Nome de usuário</Text>
+            <TextInput
+              crossOrigin=""
+              prefix="ignite.com/"
+              placeholder="se-usuario"
+              {...register("username")}
+            />
 
-        <label>
-          <Text size="sm">Nome completo</Text>
-          <TextInput
-            crossOrigin=""
-            placeholder="Seu nome"
-            {...register("name")}
-          />
+            {errors.username && (
+              <S.FormError size="sm">{errors.username.message}</S.FormError>
+            )}
+          </label>
 
-          {errors.name && (
-            <S.FormError size="sm">{errors.name.message}</S.FormError>
-          )}
-        </label>
+          <label>
+            <Text size="sm">Nome completo</Text>
+            <TextInput
+              crossOrigin=""
+              placeholder="Seu nome"
+              {...register("name")}
+            />
 
-        <Button type="submit" disabled={isSubmitting}>
-          Próximo passo
-          <ArrowRight />
-        </Button>
-      </S.Form>
-    </S.Container>
+            {errors.name && (
+              <S.FormError size="sm">{errors.name.message}</S.FormError>
+            )}
+          </label>
+
+          <Button type="submit" disabled={isSubmitting}>
+            Próximo passo
+            <ArrowRight />
+          </Button>
+        </S.Form>
+      </S.Container>
+    </>
   );
 }
